@@ -13,13 +13,16 @@ matrix:
   include:
     - perl: "5.8.1"
       install:
+        - "cpanm -n Exporter Class::ISA"
         - "cpanm -n Test::Requires Test::Fatal Test::LeakTrace"
         - "cpanm Exporter::Tiny"
         - "cpanm -n indirect multidimensional bareword::filehandles"
         - "cpanm -n Moo"
     - perl: "5.6.2"
       install:
-        - "cpanm Exporter::Tiny"    
+        - "cpanm -n Scalar::Util Text::Balanced"
+        - "cpanm -n Exporter Class::ISA"
+        - "cpanm Exporter::Tiny"
 before_install:
   - "source devel.travis/travis-perlbrew"
   - "perlbrew install-cpanm -f"
