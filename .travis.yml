@@ -7,11 +7,14 @@ matrix:
   include:
     - perl: "5.6.2"
       install:
-        - "perl -Idevel.travis -MCPAN -e'install q/Scalar::Util/'"
-        - "perl -Idevel.travis -MCPAN -e'install q/Text::Balanced/'"
-        - "perl -Idevel.travis -MCPAN -e'force install q/Exporter/'"
-        - "perl -Idevel.travis -MCPAN -e'install q/Class::ISA/'"
-        - "perl -Idevel.travis -MCPAN -e'install q/Exporter::Tiny/'"
+        - "perl -Idevel.travis -MCPAN -e'install q(Scalar::Util)'"
+        - "perl -Idevel.travis -MCPAN -e'install q(Text::Balanced)'"
+        - "perl -Idevel.travis -MCPAN -e'install q(FERREIRA/Exporter-5.63.tar.gz)'"
+        - "perl -Idevel.travis -MCPAN -e'install q(Class::ISA)'"
+        - "perl -Idevel.travis -MCPAN -e'install q(Test::More)'"
+        - "perl -Idevel.travis -MCPAN -e'install q(Exporter::Tiny)'"
+      script:
+        - "HARNESS_IS_VERBOSE=1 prove -Ilib -Iinc t"
 before_install:
   - "source devel.travis/travis-perlbrew"
   - "perlbrew install-cpanm -f"
