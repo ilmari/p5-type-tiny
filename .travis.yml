@@ -20,6 +20,7 @@ matrix:
         - "cpanm -n Moo"
     - perl: "5.6.2"
       install:
+        - "perl -e'die q/ARGH - CPAN.pm needs manual configuration/'"
         - "perl -MCPAN -e'install q/Scalar::Util/'"
         - "perl -MCPAN -e'install q/Text::Balanced/'"
         - "perl -MCPAN -e'install q/Exporter/'"
