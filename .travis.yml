@@ -12,6 +12,7 @@ matrix:
         - "perl -Idevel.travis -MCPAN -e'install q(FERREIRA/Exporter-5.63.tar.gz)'"
         - "perl -Idevel.travis -MCPAN -e'install q(Class::ISA)'"
         - "perl -Idevel.travis -MCPAN -e'install q(Test::More)'"
+        - "perl -Idevel.travis -MCPAN -e'install q(Test::Harness)'"
         - "perl -Idevel.travis -MCPAN -e'install q(Exporter::Tiny)'"
       script:
         - "HARNESS_IS_VERBOSE=1 prove -Ilib -Iinc t"
