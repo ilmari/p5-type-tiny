@@ -9,6 +9,7 @@ matrix:
       install:
         - "perl -Idevel.travis -MCPAN -e'install q(Scalar::Util)'"
         - "perl -Idevel.travis -MCPAN -e'install q(Text::Balanced)'"
+        - "perl -Idevel.travis -MCPAN -e'install q(MSCHWERN/ExtUtils-MakeMaker-6.56.tar.gz)'"
         - "perl -Idevel.travis -MCPAN -e'install q(FERREIRA/Exporter-5.63.tar.gz)'"
         - "perl -Idevel.travis -MCPAN -e'install q(Class::ISA)'"
         - "perl -Idevel.travis -MCPAN -e'install q(Test::More)'"
