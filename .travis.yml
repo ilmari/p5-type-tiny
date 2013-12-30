@@ -9,7 +9,7 @@ matrix:
       install:
         - "perl -Idevel.travis -MCPAN -e'install q/Scalar::Util/'"
         - "perl -Idevel.travis -MCPAN -e'install q/Text::Balanced/'"
-        - "perl -Idevel.travis -MCPAN -e'install q/Exporter/'"
+        - "perl -Idevel.travis -MCPAN -e'force install q/Exporter/'"
         - "perl -Idevel.travis -MCPAN -e'install q/Class::ISA/'"
         - "perl -Idevel.travis -MCPAN -e'install q/Exporter::Tiny/'"
 before_install:
