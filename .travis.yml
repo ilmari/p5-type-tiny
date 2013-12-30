@@ -20,9 +20,11 @@ matrix:
         - "cpanm -n Moo"
     - perl: "5.6.2"
       install:
-        - "cpanm -n Scalar::Util Text::Balanced"
-        - "cpanm -n Exporter Class::ISA"
-        - "cpanm Exporter::Tiny"
+        - "perl -MCPAN -e'install Scalar::Util'"
+        - "perl -MCPAN -e'install Text::Balanced'"
+        - "perl -MCPAN -e'install Exporter'"
+        - "perl -MCPAN -e'install Class::ISA'"
+        - "perl -MCPAN -e'install Exporter::Tiny'"
 before_install:
   - "source devel.travis/travis-perlbrew"
   - "perlbrew install-cpanm -f"
