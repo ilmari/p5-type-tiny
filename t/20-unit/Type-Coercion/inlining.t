@@ -52,7 +52,7 @@ use Test::Fatal;
 		from Str, 'JSON::PP::decode_json($_)';
 }
 
-my $code = T::ArrayRef->coercion->inline_coercion('$::foo');
+my $code = T::ArrayRef->coercion->freeze->inline_coercion('$::foo');
 
 our $foo = "[3,2,1]";
 

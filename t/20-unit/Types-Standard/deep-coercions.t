@@ -32,6 +32,7 @@ use Type::Utils;
 NONINLINED: {
 	my $Foo = declare Foo => as Int;
 	coerce $Foo, from Num, via { int($_) };
+	$Foo->coercion->freeze;
 	
 	my $ArrayOfFoo = declare ArrayOfFoo => as ArrayRef[$Foo], coercion => 1;
 	
@@ -139,8 +140,10 @@ NONINLINED: {
 INLINED: {
 	my $Bar = declare Bar => as Int;
 	coerce $Bar, from Num, q { int($_) };
+	$Bar->coercion->freeze;
 	
 	my $ArrayOfBar = ArrayRef[$Bar];
+	$ArrayOfBar->coercion->freeze;
 	
 	ok($ArrayOfBar->has_coercion, '$ArrayOfBar has coercion');
 	ok($ArrayOfBar->coercion->can_be_inlined, '$ArrayOfBar coercion can be inlined');
@@ -167,6 +170,7 @@ INLINED: {
 	);
 	
 	my $HashOfBar = HashRef[$Bar];
+	$HashOfBar->coercion->freeze;
 	
 	ok($HashOfBar->has_coercion, '$HashOfBar has coercion');
 	ok($HashOfBar->coercion->can_be_inlined, '$HashOfBar coercion can be inlined');
@@ -193,6 +197,8 @@ INLINED: {
 	);
 	
 	my $RefOfBar = ScalarRef[$Bar];
+	$RefOfBar->coercion->freeze;
+	
 	ok($RefOfBar->has_coercion, '$RefOfBar has coercion');
 	ok($RefOfBar->coercion->can_be_inlined, '$RefOfBar coercion can be inlined');
 	
@@ -256,7 +262,11 @@ MAP: {
 	my $IntFromArray = declare IntFromArray => as Int;
 	coerce $IntFromArray, from ArrayRef, via { scalar(@$_) };
 	
+	$_->coercion->freeze for $IntFromStr, $IntFromNum, $IntFromArray;
+	
 	my $Map1 = Map[$IntFromNum, $IntFromStr];
+	$Map1->coercion->freeze;
+	
 	ok(
 		$Map1->has_coercion && $Map1->coercion->can_be_inlined,
 		"$Map1 has an inlinable coercion",
@@ -311,13 +321,19 @@ DICT: {
 	my $IntFromArray = declare IntFromArray => as Int;
 	coerce $IntFromArray, from ArrayRef, via { scalar(@$_) };
 	
-	my @a = (a => $IntFromStr, b => $IntFromNum, c => Optional[$IntFromNum]);
+	$_->coercion->freeze for $IntFromStr, $IntFromNum, $IntFromArray;
 	
 	my $Dict1 = Dict[ a => $IntFromStr, b => $IntFromNum, c => Optional[$IntFromNum] ];
-	ok(
-		$Dict1->has_coercion && $Dict1->coercion->can_be_inlined,
-		"$Dict1 has an inlinable coercion",
-	);
+	$Dict1->coercion->freeze;
+	
+	{
+		local $TODO = "By new only-inline-when-frozen rules, strictly this should not be inlined.";
+		ok(
+			$Dict1->has_coercion && $Dict1->coercion->can_be_inlined,
+			"$Dict1 has an inlinable coercion",
+		);
+	}
+	
 	is_deeply(
 		$Dict1->coerce({ a => "Hello", b => 1.1, c => 2.2 }),
 		{ a => 5, b => 1, c => 2 },
@@ -365,11 +381,19 @@ TUPLE: {
 	my $IntFromArray = declare IntFromArray => as Int;
 	coerce $IntFromArray, from ArrayRef, via { scalar(@$_) };
 	
+	$_->coercion->freeze for $IntFromStr, $IntFromNum, $IntFromArray;
+	
 	my $Tuple1 = Tuple[ $IntFromNum, Optional[$IntFromStr], slurpy ArrayRef[$IntFromNum]];
-	ok(
-		$Tuple1->has_coercion && $Tuple1->coercion->can_be_inlined,
-		"$Tuple1 has an inlinable coercion",
-	);
+	$Tuple1->coercion->freeze;
+	
+	{
+		local $TODO = "By new only-inline-when-frozen rules, strictly this should not be inlined.";
+		ok(
+			$Tuple1->has_coercion && $Tuple1->coercion->can_be_inlined,
+			"$Tuple1 has an inlinable coercion",
+		);
+	}
+	
 	is_deeply(
 		$Tuple1->coerce([qw( 1.1 1.1 )]),
 		[1, 3],

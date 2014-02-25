@@ -31,6 +31,7 @@ use Type::Utils;
 
 my $RoundedInteger = declare RoundedInteger => as Int;
 $RoundedInteger->coercion->add_type_coercions(Num, 'int($_)');
+$RoundedInteger->coercion->freeze;
 
 should_pass("4", $RoundedInteger);
 should_fail("1.1", $RoundedInteger);
@@ -38,12 +39,14 @@ should_fail("xyz", $RoundedInteger);
 
 my $String3 = declare String3 => as StrMatch[qr/^.{3}$/];
 $String3->coercion->add_type_coercions(Str, 'substr("$_   ", 0, 3)');
+$String3->coercion->freeze;
 
 should_pass("xyz", $String3);
 should_fail("x", $String3);
 should_fail("wxyz", $String3);
 
 my $Union1 = union Union1 => [$RoundedInteger, $String3];
+$Union1->coercion->freeze;
 
 should_pass("3.4", $Union1);
 should_pass("30", $Union1);

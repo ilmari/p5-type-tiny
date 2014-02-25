@@ -177,7 +177,9 @@ sub freeze { $_[0]{frozen} = 1; $_[0] }
 sub coerce
 {
 	my $self = shift;
-	return $self->compiled_coercion->(@_);
+	$self->frozen
+		? $self->_slow_coerce(@_)
+		: $self->compiled_coercion->(@_);
 }
 
 sub assert_coerce
@@ -245,6 +247,33 @@ sub add_type_coercions
 	return $self;
 }
 
+sub _slow_coerce
+{
+	my $self = shift;
+	my @mishmash = @{$self->type_coercion_map};
+	my (@types, @codes);
+	while (@mishmash)
+	{
+		push @types, shift @mishmash;
+		push @codes, shift @mishmash;
+	}
+	if ($self->has_type_constraint)
+	{
+		unshift @types, $self->type_constraint;
+		unshift @codes, undef;
+	}
+	
+	for my $i (0..$#types)
+	{
+		local $_ = $_[0];
+		next unless $types[$i]->check(@_);
+		defined(my $code = $codes[$i]) or return $_[0];
+		return Types::TypeTiny::StringLike->check($code) ? eval($code) : $code->(@_);
+	}
+	
+	@_ ? $_[0] : ();
+}
+
 sub _build_compiled_coercion
 {
 	my $self = shift;
@@ -306,6 +335,8 @@ sub can_be_inlined
 	return
 		if $self->has_type_constraint
 		&& !$self->type_constraint->can_be_inlined;
+	
+	return unless $self->frozen;
 	
 	my @mishmash = @{$self->type_coercion_map};
 	while (@mishmash)
