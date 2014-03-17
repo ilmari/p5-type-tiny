@@ -34,10 +34,20 @@ use overload
 	q("")      => sub { caller =~ m{^(Moo::HandleMoose|Sub::Quote)} ? overload::StrVal($_[0]) : $_[0]->display_name },
 	q(bool)    => sub { 1 },
 	q(&{})     => "_overload_coderef",
-	q(+)       => sub { $_[2] ? $_[1]->plus_coercions($_[0]) : $_[0]->plus_fallback_coercions($_[1]) },
+	q(+)       => sub {
+		if (blessed $_[1] and $_[1]->isa('Type::Coercion::_Paramd'))
+		{
+			return $_[1]->complete(
+				$_[0],
+				$_[2] ? 'plus_coercions' : 'plus_fallback_coercions',
+			);
+		}
+		$_[2] ? $_[1]->plus_coercions($_[0]) : $_[0]->plus_fallback_coercions($_[1])
+	},
 	q(|)       => sub {
 		my @tc = _swap @_;
-		if (!_FIXED_PRECEDENCE && !blessed $tc[0] && ref $tc[0] eq 'ARRAY') {
+		if (!_FIXED_PRECEDENCE && !blessed $tc[0] && ref $tc[0] eq 'ARRAY')
+		{
 			require Type::Tiny::_HalfOp;
 			return "Type::Tiny::_HalfOp"->new('|', @tc);
 		}
@@ -46,7 +56,8 @@ use overload
 	},
 	q(&)       => sub {
 		my @tc = _swap @_;
-		if (!_FIXED_PRECEDENCE && !blessed $tc[0] && ref $tc[0] eq 'ARRAY') {
+		if (!_FIXED_PRECEDENCE && !blessed $tc[0] && ref $tc[0] eq 'ARRAY')
+		{
 			require Type::Tiny::_HalfOp;
 			return "Type::Tiny::_HalfOp"->new('&', @tc);
 		}

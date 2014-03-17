@@ -110,9 +110,15 @@ sub add
 	my $class = shift;
 	my ($x, $y, $swap) = @_;
 	
-	if (!blessed $y and ref $y eq 'ARRAY') {
+	if (!blessed $y and ref $y eq 'ARRAY')
+	{
 		require Type::Tiny::_HalfOp;
 		return "Type::Tiny::_HalfOp"->new('+', $y, $x);
+	}
+	
+	if (blessed $y and $y->isa('Type::Coercion::_Paramd'))
+	{
+		return "Type::Coercion::_Paramd"->add($y, $x, !$swap);
 	}
 	
 	Types::TypeTiny::TypeTiny->check($x) and return $x->plus_fallback_coercions($y);
@@ -436,14 +442,8 @@ sub parameterize
 	$self->is_parameterizable
 		or _croak "Constraint '%s' does not accept parameters", "$self";
 	
-	@_ = map Types::TypeTiny::to_TypeTiny($_), @_;
-	
-	return ref($self)->new(
-		type_constraint    => $self->type_constraint,
-		type_coercion_map  => [ $self->coercion_generator->($self, $self->type_constraint, @_) ],
-		parameters         => \@_,
-		frozen             => 1,
-	);
+	require Type::Coercion::_Paramd;
+	'Type::Coercion::_Paramd'->new([$self, @_]);
 }
 
 sub isa
